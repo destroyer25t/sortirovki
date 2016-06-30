@@ -37,7 +37,7 @@ public class Sorts {
 
 
     /*
-    Сортировка вставками
+    Сортировка вставками1
      */
     public static <T extends Comparable<T>> T[] insertSort(T[] unsortedMass) {
         for (int i = 1; i < unsortedMass.length; i++) {
