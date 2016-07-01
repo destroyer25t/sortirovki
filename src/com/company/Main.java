@@ -12,7 +12,7 @@ public class Main {
         Random randomInts = new Random();       //Объявляем объект класса Рандом
         Integer[] numbers;
         Integer[] sortedMass;
-        numbers = new Integer[10000];
+        numbers = new Integer[1000];
 
         for (int k=0;k< numbers.length; k++) {
             numbers[k] = randomInts.nextInt(10);     //заполнили массив рандомными числами

@@ -4,13 +4,14 @@ package com.company;
  * Created by Олег on 30.06.2016.
  */
 public class Sorts {
+
+    public static void Swap(Object a, Object b){
+
+    }
     /*
-    *
     * Сортировка пузырьком, с остановкой при отсутствии перестановок. Тест для Github
     * Здесь и далее используется T extends Comparable<T>. Comparable - для возможности использовать CompareTo
-    *
     * */
-
     public static <T extends Comparable<T>> T[] bubbleSort(T[] unsortedMass) {
         int length = unsortedMass.length;
         boolean sorted = false;
@@ -37,14 +38,12 @@ public class Sorts {
 
 
     /*
-    Сортировка вставками1
+    Сортировка вставками
      */
     public static <T extends Comparable<T>> T[] insertSort(T[] unsortedMass) {
         for (int i = 1; i < unsortedMass.length; i++) {
-            for (int j = i; j > 0 && (unsortedMass[j - 1].compareTo(unsortedMass[j]) > 0); j--) {
-                T temp = unsortedMass[j - 1];
-                unsortedMass[j - 1] = unsortedMass[j];
-                unsortedMass[j] = temp;
+            for(int j=i;j>0&&unsortedMass[j-1].compareTo(unsortedMass[j])>0;j--){
+
             }
         }
         return unsortedMass;
