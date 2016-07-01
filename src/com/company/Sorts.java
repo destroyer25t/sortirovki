@@ -39,7 +39,9 @@ public class Sorts {
     public static <T extends Comparable<T>> T[] insertSort(T[] unsortedMass) {
         for (int i = 1; i < unsortedMass.length; i++) {
             for(int j=i;j>0&&unsortedMass[j-1].compareTo(unsortedMass[j])>0;j--){
-
+                T temp=unsortedMass[j-1];
+                unsortedMass[j-1]=unsortedMass[j];
+                unsortedMass[j]=temp;
             }
         }
         return unsortedMass;
@@ -121,6 +123,24 @@ public class Sorts {
     *
     * */
     public static <T extends Comparable<T>> T[] splitSort(T[] unsortedMass) {
+        int indexFirstElem=0;
+        int indexLastElem=unsortedMass.length-1;
+        int half=unsortedMass.length/2;
+
+        return splitSort(unsortedMass,indexFirstElem,indexLastElem);
+    }
+
+    public static <T extends Comparable<T>> T[] splitSort(T[] unsortedMass, int indexFirstElem, int indexLastElem) {
+        if(unsortedMass.length!=2){
+            int half=unsortedMass.length/2;
+            splitSort(unsortedMass, indexFirstElem, half-1);
+            splitSort(unsortedMass, half, indexLastElem);
+        }
+        else{
+            T temp=unsortedMass[indexFirstElem];
+            unsortedMass[indexFirstElem]=unsortedMass[indexLastElem];
+            unsortedMass[indexLastElem]=temp;
+        }
         return unsortedMass;
     }
 

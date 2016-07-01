@@ -8,10 +8,15 @@ import java.util.Vector;
 * */
 public class Main {
 
-    public static void main(String[] args) {
+    /*
+    * Тестирование методов сортировки
+    */
+    private static void sortsTest(){
         Random randomInts = new Random();       //Объявляем объект класса Рандом
+
         Integer[] numbers;
         Integer[] sortedMass;
+
         numbers = new Integer[10];
 
         for (int k=0;k< numbers.length; k++) {
@@ -21,28 +26,42 @@ public class Main {
 
         Integer[] numbersClone = numbers.clone();
 
-        System.out.print("\n");
-
 
         Sorts engine= new Sorts();
 
         long start = System.currentTimeMillis();
-      //  sortedMass = engine.bubbleSort(numbersClone);
+        //  sortedMass = engine.bubbleSort(numbersClone);
         long endBubble = System.currentTimeMillis();
 
         //sortedMass =  engine.insertSort(numbers);
         //sortedMass =  engine.shakerSort(numbers);
 
         long start1 = System.currentTimeMillis();
-        sortedMass =  engine.choiseSort(numbers);
+        sortedMass=engine.splitSort(numbers);
+        // sortedMass =  engine.choiseSort(numbers);
         long endShaker = System.currentTimeMillis();
 
-      //  System.out.print("Время работы пузырька: " + (endBubble-start)*1000+"\n");
-       // System.out.print("Время работы выбором: " + (endShaker-start1)*1000+"\n");
+        //  System.out.print("Время работы пузырька: " + (endBubble-start)*1000+"\n");
+        // System.out.print("Время работы выбором: " + (endShaker-start1)*1000+"\n");
 
+        System.out.print("\n");
         for (int t : sortedMass) {
             System.out.print(t + " ");
         }
+    }
 
+    /*
+    Тестирование прочих функций
+     */
+    public static void otherTest(){
+        Integer[] knownMass = {2,5,6,4};
+        Other engine = new Other();
+        int position = engine.binarySearch(knownMass, 4);
+        System.out.println(position);
+    }
+
+    public static void main(String[] args) {
+        //sortsTest();
+        otherTest();
     }
 }
