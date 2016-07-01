@@ -11,14 +11,15 @@ public class Other {
         }
         else{
             int halfIndex=(finish+start)/2;
-            if(inputMass[halfIndex].compareTo(value)>0){
+
+            if (inputMass[halfIndex].compareTo(value)==0) {
+                position = halfIndex;
+            }
+            else if(inputMass[halfIndex].compareTo(value)>0){
                 position = binarySearch(inputMass,value,start,halfIndex-1);
             }
-            else if (inputMass[halfIndex].compareTo(value)<0){
+            else{
                 position = binarySearch(inputMass,value,halfIndex+1,finish);
-            }
-            else if (inputMass[halfIndex].compareTo(value)==0) {
-                position = halfIndex;
             }
         }
         return position;

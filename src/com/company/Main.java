@@ -54,9 +54,9 @@ public class Main {
     Тестирование прочих функций
      */
     public static void otherTest(){
-        Integer[] knownMass = {2,5,6,4};
+        Integer[] knownMass = {2,5,6,7,10};
         Other engine = new Other();
-        int position = engine.binarySearch(knownMass, 4);
+        int position = engine.binarySearch(knownMass, 2);
         System.out.println(position);
     }
 
