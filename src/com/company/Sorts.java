@@ -4,10 +4,6 @@ package com.company;
  * Created by Олег on 30.06.2016.
  */
 public class Sorts {
-
-    public static void Swap(Object a, Object b){
-
-    }
     /*
     * Сортировка пузырьком, с остановкой при отсутствии перестановок. Тест для Github
     * Здесь и далее используется T extends Comparable<T>. Comparable - для возможности использовать CompareTo
@@ -101,6 +97,21 @@ public class Sorts {
     *
     * */
     public static <T extends Comparable<T>> T[] choiseSort(T[] unsortedMass) {
+        int length=unsortedMass.length;
+        for(int i=0;i<length;i++){
+            int minIndex=i;
+            for(int j=i;j<length;j++){
+                if(unsortedMass[minIndex].compareTo(unsortedMass[j])>0){
+                    minIndex=j;
+                }
+            }
+            if(minIndex!=i){
+                T temp=unsortedMass[i];
+                unsortedMass[i]=unsortedMass[minIndex];
+                unsortedMass[minIndex]=temp;
+            }
+
+        }
         return unsortedMass;
     }
 
