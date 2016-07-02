@@ -54,10 +54,17 @@ public class Main {
     Тестирование прочих функций
      */
     public static void otherTest(){
-        Integer[] knownMass = {2,5,6,7,10};
+        Integer[] knownMass = {2,5,6,6,7};
         Other engine = new Other();
-        int position = engine.binarySearch(knownMass, 2);
-        System.out.println(position);
+        try{
+            int position = engine.binarySearch(knownMass, 7);
+            System.out.println(position);
+        }
+        catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
+        }
+
+
     }
 
     public static void main(String[] args) {
