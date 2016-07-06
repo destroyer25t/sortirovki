@@ -1,5 +1,6 @@
 package com.company;
 
+import com.sun.xml.internal.bind.v2.runtime.IllegalAnnotationException;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import java.io.*;
@@ -8,20 +9,24 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-/**
- * Created by dogan on 06.07.2016.
- */
 public class Graph {
     private boolean isOriented;
     Vector<Node> verticles;
 
+    //Конструкторы
     public Graph(){
         verticles = new Vector<>();
     }
-    //Конструкторы
+
     public Graph(boolean isOriented){
         this.isOriented=isOriented;
         verticles = new Vector<>();
+    }
+
+    public Graph(String path){
+        verticles= new Vector<>();
+        graphFromFile(path);
+
     }
 
     public Graph(boolean isOriented, int capacity){
@@ -29,32 +34,35 @@ public class Graph {
         verticles = new Vector<>(capacity);
     }
 
+    //Общие методы
     public void addNewNode(Node node){
         verticles.add(node);
     }
 
-    public void addNewNode(LinkedHashSet<Node> inputSet){
-        Iterator<Node> iterator = inputSet.iterator();
-        while(iterator.hasNext()){
-            addNewNode(iterator.next());
+    public void addNewLink(int from, int to, int weight){
+        verticles.get(from).linkedNodes.add(new Edge(to,weight));
+        if(!this.isOriented){
+            verticles.get(to).linkedNodes.add(new Edge(from,weight));
         }
     }
 
     public void showGraphInText(){
         for(int i=0; i<verticles.size();i++){
-            System.out.print("Вершина "+i+": ");
-            for(Node node:verticles){
-                Iterator<Edge> iterator = node.linkedNodes.iterator();
-                while(iterator.hasNext()){
-                    Edge temp= iterator.next();
-                    System.out.print(temp.edgeEnd);
-                }
+            Node node = verticles.get(i);
 
+                System.out.print("Вершина "+i+": ");
+            for (Edge temp : node.linkedNodes) {
+                System.out.print(temp.edgeEnd + " ");
             }
+
+
+            System.out.println();
         }
     }
 
-    public void graphFromFile(String pathToFile){
+
+    //Служебные методы
+    private void graphFromFile(String pathToFile){
         if(Objects.equals(pathToFile, "")){
             throw new IllegalArgumentException("Путь к файлу указан неверно");
         }
@@ -87,6 +95,10 @@ public class Graph {
 
                     if(stringArray.length==3){
                         verticles.elementAt(verticleIndex).addNewLink(verticleNewLinkEnd,verticleNewLinkWeight);
+                        if(!this.isOriented){
+                            verticles.elementAt(verticleNewLinkEnd).addNewLink(verticleIndex,verticleNewLinkWeight);
+                        }
+
                     }
                     else{
                         throw new IllegalArgumentException("Вершина записана в неверном формате");
@@ -109,7 +121,7 @@ public class Graph {
     private void fillVerticles(){
         for(int i=0;i<verticles.size();i++){
             Node node=new Node();
-            verticles.add(node);
+            verticles.set(i,node);
         }
     }
 
@@ -125,7 +137,13 @@ public class Graph {
 
     }
 
-    public void widthSearch(){
+    public void widthSearch(int from, int to){
+        if(!this.isOriented){
+            throw new IllegalArgumentException("Данный алгоритм недоступен для неориентированного графа");
+        }
+        ArrayDeque<Node> outputQueue=new ArrayDeque<>();
+        outputQueue.add(verticles.get(from));
+        
 
     }
 

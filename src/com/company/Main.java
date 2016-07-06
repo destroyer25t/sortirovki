@@ -12,8 +12,14 @@ public class Main {
      * Тестирование графов
      */
     private static void graphTest(){
-            Graph graph = new Graph();
-            graph.graphFromFile("C:\\Users\\Олег\\IdeaProjects\\sortirovki\\src\\com\\company\\testFiles\\graph.txt");
+        try {
+            Graph graph = new Graph("C:\\Users\\dogan\\IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt");
+            graph.showGraphInText();
+            graph.widthSearch();
+        }
+        catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -72,6 +78,7 @@ public class Main {
         catch(IllegalArgumentException e){
             System.out.println(e.getMessage());
         }
+
 
 
     }
