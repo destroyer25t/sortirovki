@@ -9,6 +9,15 @@ import java.util.Vector;
 public class Main {
 
     /*
+     * Тестирование графов
+     */
+    private static void graphTest(){
+            Graph graph = new Graph();
+            graph.graphFromFile("C:\\Users\\Олег\\IdeaProjects\\sortirovki\\src\\com\\company\\testFiles\\graph.txt");
+
+    }
+
+    /*
     * Тестирование методов сортировки
     */
     private static void sortsTest(){
@@ -69,6 +78,7 @@ public class Main {
 
     public static void main(String[] args) {
         //sortsTest();
-        otherTest();
+        //otherTest();
+        graphTest();
     }
 }
