@@ -143,7 +143,7 @@ public class Graph {
         }
         ArrayDeque<Node> outputQueue=new ArrayDeque<>();
         outputQueue.add(verticles.get(from));
-        
+
 
     }
 
