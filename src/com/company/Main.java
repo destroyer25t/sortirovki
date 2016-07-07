@@ -15,7 +15,12 @@ public class Main {
         try {
             Graph graph = new Graph("C:\\Users\\dogan\\IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt");
             graph.showGraphInText();
-            graph.widthSearch();
+            if(graph.widthSearch(0, 3)) {
+                System.out.println("Путь есть");
+            }
+            else {
+                System.out.println("Пути нет");
+            }
         }
         catch(IllegalArgumentException e){
             System.out.println(e.getMessage());

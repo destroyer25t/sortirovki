@@ -137,12 +137,24 @@ public class Graph {
 
     }
 
-    public void widthSearch(int from, int to){
-        if(!this.isOriented){
-            throw new IllegalArgumentException("Данный алгоритм недоступен для неориентированного графа");
-        }
+    public boolean widthSearch(int from, int to){
+        boolean[] marked=new boolean[this.verticles.size()];
+
         ArrayDeque<Node> outputQueue=new ArrayDeque<>();
         outputQueue.add(verticles.get(from));
+        while(outputQueue.size()!=0){
+            Node node = outputQueue.remove();
+            if(node.equals(verticles.get(to))){
+                return true;
+            }
+            else{
+                marked[]
+                for(Edge temp:node.linkedNodes){
+                    outputQueue.addLast(verticles.get(temp.edgeEnd));
+                }
+            }
+        }
+        return false;
 
 
     }
@@ -155,9 +167,11 @@ public class Graph {
 
 
  class Node{
+    private int nodeIndex;
     LinkedHashSet<Edge> linkedNodes;
 
     public Node(){
+
         linkedNodes=new LinkedHashSet<>();
     }
 
