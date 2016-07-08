@@ -8,101 +8,102 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.UUID;
 
 public class Graph {
     private boolean isOriented;
-    Vector<Node> verticles;
+    private boolean isWeighted;
+    private boolean allowNegativeWeight;
+
+    private HashMap<String, Node> vertexes;
 
     //Конструкторы
-    public Graph(){
-        verticles = new Vector<>();
+    public Graph() {
+        vertexes = new HashMap<>();
     }
 
-    public Graph(boolean isOriented){
-        this.isOriented=isOriented;
-        verticles = new Vector<>();
-    }
-
-    public Graph(String path){
-        verticles= new Vector<>();
+    public Graph(String path) {
+        vertexes = new HashMap<>();
         graphFromFile(path);
-
     }
 
-    public Graph(boolean isOriented, int capacity){
-        this.isOriented=isOriented;
-        verticles = new Vector<>(capacity);
+    public Graph(boolean allowNegativeWeight, boolean isOriented, int capacity) {
+        this.allowNegativeWeight = allowNegativeWeight;
+        this.isOriented = isOriented;
+        vertexes = new HashMap<>(capacity);
+
     }
 
     //Общие методы
-    public void addNewNode(Node node){
-        verticles.add(node);
+    public void addNewNode(Node node) {
+        String uuid = UUID.randomUUID().toString();
+        uuid = node.getNodeIndex();
+        vertexes.put(uuid, node);
     }
 
-    public void addNewLink(int from, int to, int weight){
-        verticles.get(from).linkedNodes.add(new Edge(to,weight));
-        if(!this.isOriented){
-            verticles.get(to).linkedNodes.add(new Edge(from,weight));
-        }
-    }
-
-    public void showGraphInText(){
-        for(int i=0; i<verticles.size();i++){
-            Node node = verticles.get(i);
-
-                System.out.print("Вершина "+i+": ");
-            for (Edge temp : node.linkedNodes) {
-                System.out.print(temp.edgeEnd + " ");
+    public void addNewNode(Node node, String index) {
+        try {
+            if (!vertexes.containsKey(index)) {
+                vertexes.put(index, node);
+            } else {
+                throw new IllegalArgumentException("WARNING! Вершина с таким ключом уже включена в состав графа. Ключ будет изменен.");
             }
-
-
-            System.out.println();
+        } finally {
+            String uuid = UUID.randomUUID().toString();
+            node.setNodeIndex(node.getNodeIndex() + " " + uuid);
+            vertexes.put(uuid, node);
         }
+    }
+
+    public void addNewNode(Node node, String index, LinkedHashSet<Edge> edges) {
+        edges = node.getLinkedNodes();
+        addNewNode(node, index);
+    }
+
+
+    public void makeLink(String keyFrom, String keyTo, float weight) throws IllegalArgumentException {
+        if (allowNegativeWeight == false && weight <= 0) {
+            throw new IllegalArgumentException("Ребра с отрицательным весом были запрещены при создании графа.");
+        }
+
+        if (vertexes.containsKey(keyFrom) && vertexes.containsKey(keyTo)) {
+            Node nodeFrom = vertexes.get(keyFrom);
+            nodeFrom.addNewLink(keyTo, weight);
+        } else {
+            throw new IllegalArgumentException("Ключ одной из вершин не существует.");
+        }
+    }
+
+    public void showGraphInText() {
+
     }
 
 
     //Служебные методы
-    private void graphFromFile(String pathToFile){
-        if(Objects.equals(pathToFile, "")){
+    private void graphFromFile(String pathToFile) {
+        if (Objects.equals(pathToFile, "")) {
             throw new IllegalArgumentException("Путь к файлу указан неверно");
-        }
-        else{
+        } else {
             BufferedReader fileReader;
             try {
-                List<String> lines = Files.readAllLines(Paths.get(pathToFile) ,StandardCharsets.UTF_8);
-                this.verticles.setSize(Integer.parseInt(lines.get(0))); //устанавливаем количество вершин (из файла)
-                fillVerticles();
+                List<String> lines = Files.readAllLines(Paths.get(pathToFile), StandardCharsets.UTF_8);
 
+                this.isOriented=(String inputString)->
                 //устанавливаем ориентированность графа
-                if(lines.get(1).toLowerCase().equals("true")){
-                    this.isOriented=true;
-                }
-                else if(lines.get(1).toLowerCase().equals("false")){
-                    this.isOriented=false;
-                }
-                else{
+                if (lines.get(1).toLowerCase().equals("true")) {
+                    this.isOriented = true;
+                } else if (lines.get(1).toLowerCase().equals("false")) {
+                    this.isOriented = false;
+                } else {
                     throw new IllegalArgumentException("Ошибка при чтении файла: неверно указан параметр ориентации");
                 }
 
-                //заполняем сведения о вершинах
-                for(int i=2;i<lines.size();i++){
-                    String infoLine = lines.get(i);
-                    String[] stringArray = infoLine.split(" ");
-
-                    int verticleIndex=Integer.parseInt(stringArray[0]);
-                    int verticleNewLinkEnd = Integer.parseInt(stringArray[1]);
-                    int verticleNewLinkWeight = Integer.parseInt(stringArray[2]);
-
-                    if(stringArray.length==3){
-                        verticles.elementAt(verticleIndex).addNewLink(verticleNewLinkEnd,verticleNewLinkWeight);
-                        if(!this.isOriented){
-                            verticles.elementAt(verticleNewLinkEnd).addNewLink(verticleIndex,verticleNewLinkWeight);
-                        }
-
-                    }
-                    else{
-                        throw new IllegalArgumentException("Вершина записана в неверном формате");
-                    }
+                if (lines.get(2).toLowerCase().equals("true")) {
+                    this.allowNegativeWeight=true;
+                } else if (lines.get(2).toLowerCase().equals("false")) {
+                    this.allowNegativeWeight=false;
+                } else {
+                    throw new IllegalArgumentException("Ошибка при чтении файла: неверно указан параметр разрешающий использование ребер с отрицательыми весами.");
                 }
 
 
@@ -113,42 +114,33 @@ public class Graph {
             }
 
 
-
         }
     }
 
-    //Заполняем весь наш вектор пустыми вершинами
-    private void fillVerticles(){
-        for(int i=0;i<verticles.size();i++){
-            Node node=new Node();
-            verticles.set(i,node);
-        }
-    }
 
-    public void djkstraAlgo(){
+    public void djkstraAlgo() {
 
     }
 
-    public void uorshallAlgo(){
+    public void uorshallAlgo() {
 
     }
 
-    public void depthSearch(){
+    public void depthSearch() {
 
     }
 
-    public boolean widthSearch(int from, int to){
-        boolean[] marked=new boolean[this.verticles.size()];
+    public boolean widthSearch(int from, int to) {
+        boolean[] marked = new boolean[this.verticles.size()];
 
-        ArrayDeque<Node> outputQueue=new ArrayDeque<>();
+        ArrayDeque<Node> outputQueue = new ArrayDeque<>();
         outputQueue.add(verticles.get(from));
-        while(outputQueue.size()!=0){
+        while (outputQueue.size() != 0) {
             Node node = outputQueue.remove();
-            if(node.equals(verticles.get(to))){
+            if (node.equals(verticles.get(to))) {
                 return true;
-            }
-            else{
-                for(Edge temp:node.linkedNodes){
+            } else {
+                for (Edge temp : node.linkedNodes) {
                     outputQueue.addLast(verticles.get(temp.edgeEnd));
                 }
             }
@@ -158,34 +150,50 @@ public class Graph {
 
     }
 
-    public void primAlgo(){
+    public void primAlgo() {
 
     }
 
 }
 
 
- class Node{
-    private int nodeIndex;
-    LinkedHashSet<Edge> linkedNodes;
+class Node {
+    private String nodeIndex;
+    private LinkedHashSet<Edge> linkedNodes;
 
-    public Node(){
-
-        linkedNodes=new LinkedHashSet<>();
+    public Node() {
+        linkedNodes = new LinkedHashSet<>();
     }
 
-    public void addNewLink(int numberOfNode, int weightOfEdge){
-        Edge edge = new Edge(numberOfNode,weightOfEdge);
+    public Node(String nodeIndex, ){
+
+    }
+
+    public String getNodeIndex() {
+        return nodeIndex;
+    }
+
+    public void setNodeIndex(String nodeIndex) {
+        this.nodeIndex = nodeIndex;
+    }
+
+    public LinkedHashSet<Edge> getLinkedNodes() {
+        return linkedNodes;
+    }
+
+    public void addNewLink(String keyOfNodeTo, float weightOfEdge) {
+        Edge edge = new Edge(keyOfNodeTo, weightOfEdge);
         linkedNodes.add(edge);
     }
+
 }
 
-class Edge{
-    public int edgeEnd;
-    public int edgeWeight;
+class Edge {
+    public String edgeEnd;
+    public float edgeWeight;
 
-    public Edge(int numberOfNode, int weightOfEdge){
-        edgeEnd=numberOfNode;
-        edgeWeight=weightOfEdge;
+    public Edge(String to, float weightOfEdge) {
+        edgeEnd = to;
+        edgeWeight = weightOfEdge;
     }
 }
