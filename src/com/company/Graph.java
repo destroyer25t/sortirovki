@@ -148,7 +148,6 @@ public class Graph {
                 return true;
             }
             else{
-                marked[]
                 for(Edge temp:node.linkedNodes){
                     outputQueue.addLast(verticles.get(temp.edgeEnd));
                 }
