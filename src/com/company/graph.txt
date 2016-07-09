@@ -1,12 +1,13 @@
 true
 true
-first_index, second_index, 3, 5, 10, yekaterinburg, megacity;
-first_index->second_index:70
-second_index->10:5
-second_index->yekaterinburg:80
-megacity->second_index:10
-5->10:3
-3->10:20
-10->megacity:9
-10->first_index:100
-5->3:18
+first_index, second_index, 3, 5, 10, yekaterinburg,
+megacity,fkkkkkkkkkkkkkkkkkkkkkkkfffffffffffffffffffffffffffffffff,ffffffffffffffffffffffsalf;
+first_index->second_index->70
+second_index->10->5
+second_index->yekaterinburg->80
+megacity->second_index->10
+5->10->3
+3->10->20
+10->megacity->9
+10->first_index->100
+5->3->18

@@ -88,24 +88,43 @@ public class Graph {
             try {
                 List<String> lines = Files.readAllLines(Paths.get(pathToFile), StandardCharsets.UTF_8);
 
-                this.isOriented=(String inputString)->
-                //устанавливаем ориентированность графа
-                if (lines.get(1).toLowerCase().equals("true")) {
+                //считывание первых двух строк - ориентированность и можно ли использовать отриц.веса
+                if (lines.get(0).toLowerCase().equals("true")) {
                     this.isOriented = true;
-                } else if (lines.get(1).toLowerCase().equals("false")) {
+                } else if (lines.get(0).toLowerCase().equals("false")) {
                     this.isOriented = false;
                 } else {
                     throw new IllegalArgumentException("Ошибка при чтении файла: неверно указан параметр ориентации");
                 }
 
-                if (lines.get(2).toLowerCase().equals("true")) {
+                if (lines.get(1).toLowerCase().equals("true")) {
                     this.allowNegativeWeight=true;
-                } else if (lines.get(2).toLowerCase().equals("false")) {
+                } else if (lines.get(1).toLowerCase().equals("false")) {
                     this.allowNegativeWeight=false;
                 } else {
                     throw new IllegalArgumentException("Ошибка при чтении файла: неверно указан параметр разрешающий использование ребер с отрицательыми весами.");
                 }
 
+                String[] vertexesString = lines.get(2).split(",");  //получаем третью строку со списком всех вершин
+
+                for(String string:vertexesString){                  //каждую загоняем в vertexes - map
+                    Node node = new Node(string);
+                    vertexes.put(string, node);
+                }
+
+                for(int i=3;i<lines.size();i++){                    //оставшиеся строки, которые говорят о связях между вершинами обрабатываем
+                    String[] elementsOfString = lines.get(i).split("->");
+                    if(elementsOfString.length==3){
+
+                        String keyFrom=elementsOfString[0];
+                        String keyTo=elementsOfString[1];
+                        float weight = Float.valueOf(elementsOfString[2]);
+                        Node node = vertexes.get(keyFrom);
+                        node.addNewLink(keyTo,weight);          //добавили новую связь
+                    }else{
+                        throw new IllegalArgumentException("Неверная запись связи в строке "+ i+". Проверьте файл с данными.");
+                    }
+                }
 
             } catch (FileNotFoundException e) {
                 System.out.println(e.getMessage());
@@ -131,6 +150,7 @@ public class Graph {
     }
 
     public boolean widthSearch(int from, int to) {
+        /*
         boolean[] marked = new boolean[this.verticles.size()];
 
         ArrayDeque<Node> outputQueue = new ArrayDeque<>();
@@ -147,7 +167,7 @@ public class Graph {
         }
         return false;
 
-
+*/
     }
 
     public void primAlgo() {
@@ -165,8 +185,9 @@ class Node {
         linkedNodes = new LinkedHashSet<>();
     }
 
-    public Node(String nodeIndex, ){
-
+    public Node(String nodeIndex){
+        this.nodeIndex=nodeIndex;
+        linkedNodes = new LinkedHashSet<>();
     }
 
     public String getNodeIndex() {
