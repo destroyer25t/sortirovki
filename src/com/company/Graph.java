@@ -75,6 +75,20 @@ public class Graph {
     }
 
     public void showGraphInText() {
+        for(Map.Entry<String, Node> entry: vertexes.entrySet()){
+            Node node = entry.getValue();
+            System.out.print("Вершина "+ node.getNodeIndex()+": ");
+            LinkedHashSet<Edge> edges = node.getLinkedNodes();
+            for(Edge edge:edges){
+                System.out.print(edge.edgeEnd+"("+edge.edgeWeight+")");
+                System.out.print(" ");
+            }
+            System.out.println();
+
+        }
+    }
+
+    public void showInfoAboutNode(Node node){
 
     }
 
@@ -105,22 +119,21 @@ public class Graph {
                     throw new IllegalArgumentException("Ошибка при чтении файла: неверно указан параметр разрешающий использование ребер с отрицательыми весами.");
                 }
 
-                String[] vertexesString = lines.get(2).split(",");  //получаем третью строку со списком всех вершин
-
-                for(String string:vertexesString){                  //каждую загоняем в vertexes - map
-                    Node node = new Node(string);
-                    vertexes.put(string, node);
-                }
-
-                for(int i=3;i<lines.size();i++){                    //оставшиеся строки, которые говорят о связях между вершинами обрабатываем
+                for(int i=createVertexesInMap(lines);i<lines.size();i++){                    //заполняем Map вершинами без содержания, после начинаем цикл по оставшимся вершинам
                     String[] elementsOfString = lines.get(i).split("->");
                     if(elementsOfString.length==3){
-
                         String keyFrom=elementsOfString[0];
                         String keyTo=elementsOfString[1];
                         float weight = Float.valueOf(elementsOfString[2]);
-                        Node node = vertexes.get(keyFrom);
-                        node.addNewLink(keyTo,weight);          //добавили новую связь
+                            Node node = vertexes.get(keyFrom);
+                            node.addNewLink(keyTo,weight);          //добавили новую связь
+
+
+                        if(!this.isOriented){
+                            Node nodeRevert = vertexes.get(keyTo);
+                            nodeRevert.addNewLink(keyFrom,weight);
+                        }
+
                     }else{
                         throw new IllegalArgumentException("Неверная запись связи в строке "+ i+". Проверьте файл с данными.");
                     }
@@ -136,6 +149,39 @@ public class Graph {
         }
     }
 
+
+    /*
+    * @param lines Массив строк полученных из файла
+    * @return stringCounter Строка с которой начинается перечисление связей
+    *
+    * */
+    private int createVertexesInMap(List<String> lines){
+        int stringCounter=2;
+        String temp[];
+        boolean isEnd=false;
+        do{
+            temp=lines.get(stringCounter).split(",");
+            char symbol;
+            for(String string:temp){                  //каждую загоняем в vertexes - map
+                string=string.trim();
+                symbol=string.charAt(string.length()-1);
+                if(symbol==';'){
+                    String cuttedString=string.substring(0,string.length()-1);
+                    Node node = new Node(cuttedString);
+                    vertexes.put(cuttedString, node);
+                    isEnd=true;
+                }
+                else{
+                    Node node = new Node(string);
+                    vertexes.put(string, node);
+                }
+
+            }
+            stringCounter++;
+        }while(isEnd!=true);
+        return stringCounter;
+
+    }
 
     public void djkstraAlgo() {
 
@@ -164,10 +210,10 @@ public class Graph {
                     outputQueue.addLast(verticles.get(temp.edgeEnd));
                 }
             }
-        }
+        }*/
         return false;
 
-*/
+
     }
 
     public void primAlgo() {
