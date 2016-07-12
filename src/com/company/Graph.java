@@ -1,6 +1,7 @@
 package com.company;
 
 import com.sun.xml.internal.bind.v2.runtime.IllegalAnnotationException;
+import com.sun.xml.internal.fastinfoset.sax.SystemIdResolver;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import java.io.*;
@@ -35,12 +36,21 @@ public class Graph {
     }
 
     //Общие методы
+    /*
+    * Добавляет новую вершину в граф
+    * @param node Готовая вершина
+    * */
     public void addNewNode(Node node) {
         String uuid = UUID.randomUUID().toString();
         uuid = node.getNodeIndex();
         vertexes.put(uuid, node);
     }
 
+    /*
+    * Добавляет новую вершину в граф с указанным ключом
+    * @param node Готовая вершина
+    * @param index Ключ вершины
+    * */
     public void addNewNode(Node node, String index) {
         try {
             if (!vertexes.containsKey(index)) {
@@ -55,12 +65,24 @@ public class Graph {
         }
     }
 
+    /*
+    * Добавляет новую вершину в граф вместе со связями и ключом
+    * @param node Готовая вершина
+    * @param index Ключ вершины
+    * @param edges Набор связей между данной вершиной и другими
+    * */
     public void addNewNode(Node node, String index, LinkedHashSet<Edge> edges) {
         edges = node.getLinkedNodes();
         addNewNode(node, index);
     }
 
 
+    /*
+    * Создает связь между двумя существующими вершинами с указанным весом
+    * @param keyFrom Вершина из которой строится связь
+    * @param keyTo Вершина в которую строится связь
+    * @param weight Вес связи
+    * */
     public void makeLink(String keyFrom, String keyTo, float weight) throws IllegalArgumentException {
         if (allowNegativeWeight == false && weight <= 0) {
             throw new IllegalArgumentException("Ребра с отрицательным весом были запрещены при создании графа.");
@@ -74,6 +96,9 @@ public class Graph {
         }
     }
 
+    /*
+    * Выводит в консоль вершины и связи между ними
+    * */
     public void showGraphInText() {
         for(Map.Entry<String, Node> entry: vertexes.entrySet()){
             Node node = entry.getValue();
@@ -94,6 +119,11 @@ public class Graph {
 
 
     //Служебные методы
+    /*
+    * Заполняет vertexes в классе из файла
+    * @param pathToFile Массив строк полученных из файла
+    *
+    * */
     private void graphFromFile(String pathToFile) {
         if (Objects.equals(pathToFile, "")) {
             throw new IllegalArgumentException("Путь к файлу указан неверно");
@@ -125,8 +155,13 @@ public class Graph {
                         String keyFrom=elementsOfString[0];
                         String keyTo=elementsOfString[1];
                         float weight = Float.valueOf(elementsOfString[2]);
-                            Node node = vertexes.get(keyFrom);
-                            node.addNewLink(keyTo,weight);          //добавили новую связь
+
+                        Node node = vertexes.get(keyFrom);
+                        if(node.equals(null)||!vertexes.containsKey(keyTo)){
+                            throw new IllegalArgumentException("В строке "+ (i+1) +" указан неверный ключ. Проверьте файл с данными.");
+                        }
+
+                        node.addNewLink(keyTo,weight);          //добавили новую связь
 
 
                         if(!this.isOriented){
@@ -151,6 +186,7 @@ public class Graph {
 
 
     /*
+    * Заполняем vertexes вершинами
     * @param lines Массив строк полученных из файла
     * @return stringCounter Строка с которой начинается перечисление связей
     *
@@ -184,7 +220,9 @@ public class Graph {
     }
 
     public void djkstraAlgo() {
-
+        if(this.allowNegativeWeight){
+            throw new IllegalArgumentException("Данный алгоритм работает с положительными связями.");
+        }
     }
 
     public void uorshallAlgo() {
@@ -195,22 +233,32 @@ public class Graph {
 
     }
 
-    public boolean widthSearch(int from, int to) {
-        /*
-        boolean[] marked = new boolean[this.verticles.size()];
+    /*
+    * Проверка существования пути и его построение
+    * @param from Вершина из которой ищется путь
+    * @param to Вершина в которую ищется путь
+    * */
+    public boolean widthSearch(String from, String to) {
+
+        HashSet<String> marked = new HashSet<>(vertexes.size());
 
         ArrayDeque<Node> outputQueue = new ArrayDeque<>();
-        outputQueue.add(verticles.get(from));
+        outputQueue.add(vertexes.get(from));
         while (outputQueue.size() != 0) {
             Node node = outputQueue.remove();
-            if (node.equals(verticles.get(to))) {
+            marked.add(node.getNodeIndex());
+            if (node.equals(vertexes.get(to))) {
                 return true;
             } else {
-                for (Edge temp : node.linkedNodes) {
-                    outputQueue.addLast(verticles.get(temp.edgeEnd));
+                for (Edge temp : node.getLinkedNodes()) {
+                    Node nodeTemp = vertexes.get(temp.edgeEnd);
+                    if(!marked.contains(nodeTemp.getNodeIndex())){
+                        outputQueue.addLast(nodeTemp);
+                    }
+
                 }
             }
-        }*/
+        }
         return false;
 
 

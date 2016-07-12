@@ -7,5 +7,6 @@ Yekaterinburg->Kazan->1068
 Yekaterinburg->Vladivostok->7384
 Yekaterinburg->Rezh->73
 Yekaterinburg->Novosibirsk->1598
-Kazan->ARZAMAS->448
+Kazan->ARZAMAS-2->448
+Kazan->Moscow->805
 Sankt-Peterburg->Kronshtadt->52
