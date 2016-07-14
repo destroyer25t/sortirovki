@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.UUID;
 
+import static java.lang.Float.POSITIVE_INFINITY;
+
 public class Graph {
     private boolean isOriented;
     private boolean isWeighted;
@@ -100,12 +102,12 @@ public class Graph {
     * Выводит в консоль вершины и связи между ними
     * */
     public void showGraphInText() {
-        for(Map.Entry<String, Node> entry: vertexes.entrySet()){
+        for (Map.Entry<String, Node> entry : vertexes.entrySet()) {
             Node node = entry.getValue();
-            System.out.print("Вершина "+ node.getNodeIndex()+": ");
+            System.out.print("Вершина " + node.getNodeIndex() + ": ");
             LinkedHashSet<Edge> edges = node.getLinkedNodes();
-            for(Edge edge:edges){
-                System.out.print(edge.edgeEnd+"("+edge.edgeWeight+")");
+            for (Edge edge : edges) {
+                System.out.print(edge.edgeEnd + "(" + edge.edgeWeight + ")");
                 System.out.print(" ");
             }
             System.out.println();
@@ -113,7 +115,7 @@ public class Graph {
         }
     }
 
-    public void showInfoAboutNode(Node node){
+    public void showInfoAboutNode(Node node) {
 
     }
 
@@ -142,35 +144,35 @@ public class Graph {
                 }
 
                 if (lines.get(1).toLowerCase().equals("true")) {
-                    this.allowNegativeWeight=true;
+                    this.allowNegativeWeight = true;
                 } else if (lines.get(1).toLowerCase().equals("false")) {
-                    this.allowNegativeWeight=false;
+                    this.allowNegativeWeight = false;
                 } else {
                     throw new IllegalArgumentException("Ошибка при чтении файла: неверно указан параметр разрешающий использование ребер с отрицательыми весами.");
                 }
 
-                for(int i=createVertexesInMap(lines);i<lines.size();i++){                    //заполняем Map вершинами без содержания, после начинаем цикл по оставшимся вершинам
+                for (int i = createVertexesInMap(lines); i < lines.size(); i++) {                    //заполняем Map вершинами без содержания, после начинаем цикл по оставшимся вершинам
                     String[] elementsOfString = lines.get(i).split("->");
-                    if(elementsOfString.length==3){
-                        String keyFrom=elementsOfString[0];
-                        String keyTo=elementsOfString[1];
+                    if (elementsOfString.length == 3) {
+                        String keyFrom = elementsOfString[0];
+                        String keyTo = elementsOfString[1];
                         float weight = Float.valueOf(elementsOfString[2]);
 
                         Node node = vertexes.get(keyFrom);
-                        if(node.equals(null)||!vertexes.containsKey(keyTo)){
-                            throw new IllegalArgumentException("В строке "+ (i+1) +" указан неверный ключ. Проверьте файл с данными.");
+                        if (node.equals(null) || !vertexes.containsKey(keyTo)) {
+                            throw new IllegalArgumentException("В строке " + (i + 1) + " указан неверный ключ. Проверьте файл с данными.");
                         }
 
-                        node.addNewLink(keyTo,weight);          //добавили новую связь
+                        node.addNewLink(keyTo, weight);          //добавили новую связь
 
 
-                        if(!this.isOriented){
+                        if (!this.isOriented) {
                             Node nodeRevert = vertexes.get(keyTo);
-                            nodeRevert.addNewLink(keyFrom,weight);
+                            nodeRevert.addNewLink(keyFrom, weight);
                         }
 
-                    }else{
-                        throw new IllegalArgumentException("Неверная запись связи в строке "+ i+". Проверьте файл с данными.");
+                    } else {
+                        throw new IllegalArgumentException("Неверная запись связи в строке " + i + ". Проверьте файл с данными.");
                     }
                 }
 
@@ -191,39 +193,33 @@ public class Graph {
     * @return stringCounter Строка с которой начинается перечисление связей
     *
     * */
-    private int createVertexesInMap(List<String> lines){
-        int stringCounter=2;
+    private int createVertexesInMap(List<String> lines) {
+        int stringCounter = 2;
         String temp[];
-        boolean isEnd=false;
-        do{
-            temp=lines.get(stringCounter).split(",");
+        boolean isEnd = false;
+        do {
+            temp = lines.get(stringCounter).split(",");
             char symbol;
-            for(String string:temp){                  //каждую загоняем в vertexes - map
-                string=string.trim();
-                symbol=string.charAt(string.length()-1);
-                if(symbol==';'){
-                    String cuttedString=string.substring(0,string.length()-1);
+            for (String string : temp) {                  //каждую загоняем в vertexes - map
+                string = string.trim();
+                symbol = string.charAt(string.length() - 1);
+                if (symbol == ';') {
+                    String cuttedString = string.substring(0, string.length() - 1);
                     Node node = new Node(cuttedString);
                     vertexes.put(cuttedString, node);
-                    isEnd=true;
-                }
-                else{
+                    isEnd = true;
+                } else {
                     Node node = new Node(string);
                     vertexes.put(string, node);
                 }
 
             }
             stringCounter++;
-        }while(isEnd!=true);
+        } while (isEnd != true);
         return stringCounter;
 
     }
 
-    public void djkstraAlgo() {
-        if(this.allowNegativeWeight){
-            throw new IllegalArgumentException("Данный алгоритм работает с положительными связями.");
-        }
-    }
 
     public void uorshallAlgo() {
 
@@ -252,7 +248,7 @@ public class Graph {
             } else {
                 for (Edge temp : node.getLinkedNodes()) {
                     Node nodeTemp = vertexes.get(temp.edgeEnd);
-                    if(!marked.contains(nodeTemp.getNodeIndex())){
+                    if (!marked.contains(nodeTemp.getNodeIndex())) {
                         outputQueue.addLast(nodeTemp);
                     }
 
@@ -268,6 +264,38 @@ public class Graph {
 
     }
 
+    public void djkstraAlgo(String keyFrom) {
+        if (this.allowNegativeWeight) {
+            throw new IllegalArgumentException("Данный алгоритм работает с положительными связями.");
+        }
+        LinkedHashMap<NodeDjkstra> mainDjkstraList = new LinkedHashMap<>();
+        Set<String> keysVertexes=vertexes.keySet();
+        //заполняем список информацией нужной для работы алгоритма Дейкстры - длине пути и показателя участвовала ли уже эта вершина. Вершине из которой будем
+        //считать, присваиваем вес ноль.
+        for(String string:keysVertexes){
+            Node node= vertexes.get(string);
+            NodeDjkstra nodeDjkstra;
+            if(node.getNodeIndex().equals(keyFrom)){
+                nodeDjkstra=new NodeDjkstra(node,0);
+
+            }else{
+                nodeDjkstra=new NodeDjkstra(node);
+            }
+            mainDjkstraList.add(nodeDjkstra);
+        }
+
+       // После заполнения сортируем список.
+        NodeDjkstraComparator comp = new NodeDjkstraComparator();
+        Collections.sort(mainDjkstraList,comp);
+
+        while(mainDjkstraList.size()!=0){
+
+        }
+
+
+
+    }
+
 }
 
 
@@ -275,12 +303,21 @@ class Node {
     private String nodeIndex;
     private LinkedHashSet<Edge> linkedNodes;
 
+    //для алгоритма дейкстры
+    boolean isUsed = false;
+    float currentWeight = POSITIVE_INFINITY;
+
     public Node() {
         linkedNodes = new LinkedHashSet<>();
     }
 
-    public Node(String nodeIndex){
-        this.nodeIndex=nodeIndex;
+    public Node(Node obj) {
+        nodeIndex = obj.getNodeIndex();
+        linkedNodes = obj.getLinkedNodes();
+    }
+
+    public Node(String nodeIndex) {
+        this.nodeIndex = nodeIndex;
         linkedNodes = new LinkedHashSet<>();
     }
 
@@ -301,6 +338,45 @@ class Node {
         linkedNodes.add(edge);
     }
 
+    public void resetIsUsedAndCurrentWeight(){
+        isUsed=false;
+        currentWeight=POSITIVE_INFINITY;
+    }
+
+}
+
+class NodeDjkstra extends Node{
+
+
+    public NodeDjkstra(NodeDjkstra node) {
+        super(node);
+        this.isUsed = node.isUsed;
+        this.currentWeight = node.currentWeight;
+    }
+
+    public NodeDjkstra(Node node){
+        super(node);
+    }
+
+    NodeDjkstra(Node node, boolean isUsed, float currentWeight) {
+        super(node);
+        this.isUsed = isUsed;
+        this.currentWeight = currentWeight;
+    }
+
+    NodeDjkstra(Node node, float currentWeight) {
+        super(node);
+        this.currentWeight=currentWeight;
+    }
+}
+
+class NodeDjkstraComparator implements Comparator<NodeDjkstra> {
+    @Override
+    public int compare(NodeDjkstra o1, NodeDjkstra o2) {
+        int result;
+        result=Float.compare(o1.currentWeight,o2.currentWeight);            //у нас есть POSITIVE_INFINITY, поэтому воспользуемся правильным методов сравнения
+        return result;
+    }
 }
 
 class Edge {

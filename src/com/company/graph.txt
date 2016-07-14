@@ -1,5 +1,5 @@
 false
-true
+false
 Moscow, Sankt-Peterburg, Yekaterinburg, Novosibirsk, Rezh, Kronshtadt,
 Vladivostok,Kazan, ARZAMAS-2;
 Moscow->Sankt-Peterburg->706

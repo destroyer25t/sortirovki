@@ -15,13 +15,7 @@ public class Main {
         try {
             Graph graph = new Graph("C:\\Users\\Олег\\IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt");
             graph.showGraphInText();
-
-            if(graph.widthSearch("Yekaterinburg", "Moscow")) {
-                System.out.println("Путь есть");
-            }
-            else {
-                System.out.println("Пути нет");
-            }
+            graph.djkstraAlgo("Yekaterinburg");
 
         }
         catch(IllegalArgumentException e){
