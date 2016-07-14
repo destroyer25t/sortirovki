@@ -14,7 +14,7 @@ public class Main {
     private static void graphTest(){
         try {
             Graph graph = new Graph("C:\\Users\\Олег\\IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt");
-            graph.showGraphInText();
+            //graph.showGraphInText();
             graph.djkstraAlgo("Yekaterinburg");
 
         }

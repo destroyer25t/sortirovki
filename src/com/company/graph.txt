@@ -4,9 +4,10 @@ Moscow, Sankt-Peterburg, Yekaterinburg, Novosibirsk, Rezh, Kronshtadt,
 Vladivostok,Kazan, ARZAMAS-2;
 Moscow->Sankt-Peterburg->706
 Yekaterinburg->Kazan->1068
-Yekaterinburg->Vladivostok->7384
 Yekaterinburg->Rezh->73
 Yekaterinburg->Novosibirsk->1598
+Novosibirsk->Vladivostok->5790
+Yekaterinburg->Vladivostok->10500
 Kazan->ARZAMAS-2->448
 Kazan->Moscow->805
 Sankt-Peterburg->Kronshtadt->52

@@ -98,25 +98,49 @@ public class Graph {
         }
     }
 
+
     /*
     * Выводит в консоль вершины и связи между ними
     * */
     public void showGraphInText() {
         for (Map.Entry<String, Node> entry : vertexes.entrySet()) {
-            Node node = entry.getValue();
-            System.out.print("Вершина " + node.getNodeIndex() + ": ");
-            LinkedHashSet<Edge> edges = node.getLinkedNodes();
-            for (Edge edge : edges) {
-                System.out.print(edge.edgeEnd + "(" + edge.edgeWeight + ")");
-                System.out.print(" ");
-            }
-            System.out.println();
-
+            showInfoAboutNode(entry.getValue());
         }
     }
 
     public void showInfoAboutNode(Node node) {
+        System.out.print("Вершина " + node.getNodeIndex() + ": ");
+        LinkedHashSet<Edge> edges = node.getLinkedNodes();
+        for (Edge edge : edges) {
+            System.out.print(edge.edgeEnd + "(" + edge.edgeWeight + ")");
+            System.out.print(" ");
+        }
+        System.out.println();
+    }
 
+    public void showInfoAboutNodeWithWeight(Node node) {
+        LinkedList<String> fullPathKeys=new LinkedList<>();
+
+        if(node.keyOfPreviousNode!=null){
+            showInfoAboutNodeWithWeight(vertexes.get(node.keyOfPreviousNode),fullPathKeys);
+        }
+        fullPathKeys.addLast(node.getNodeIndex());
+        Iterator<String> iter=fullPathKeys.iterator();
+
+        while(iter.hasNext()){
+            System.out.print("->"+iter.next());
+        }
+
+        System.out.print(" Длина пути: "+node.currentWeight);
+        System.out.println();
+    }
+
+    private LinkedList<String> showInfoAboutNodeWithWeight(Node node, LinkedList<String> list){
+        if(node.keyOfPreviousNode!=null){
+            list.add(node.getNodeIndex());
+            showInfoAboutNodeWithWeight(vertexes.get(node.keyOfPreviousNode),list);
+        }
+        return list;
     }
 
 
@@ -185,6 +209,7 @@ public class Graph {
 
         }
     }
+
 
 
     /*
@@ -264,35 +289,44 @@ public class Graph {
 
     }
 
+
+    /**
+     * @param keyFrom Ключ вершины из которой при помощи алгоритма Дейкстры будут построены кратчайшие расстояния до остальных вершин
+     */
     public void djkstraAlgo(String keyFrom) {
         if (this.allowNegativeWeight) {
             throw new IllegalArgumentException("Данный алгоритм работает с положительными связями.");
         }
-        LinkedHashMap<NodeDjkstra> mainDjkstraList = new LinkedHashMap<>();
-        Set<String> keysVertexes=vertexes.keySet();
-        //заполняем список информацией нужной для работы алгоритма Дейкстры - длине пути и показателя участвовала ли уже эта вершина. Вершине из которой будем
-        //считать, присваиваем вес ноль.
-        for(String string:keysVertexes){
-            Node node= vertexes.get(string);
-            NodeDjkstra nodeDjkstra;
-            if(node.getNodeIndex().equals(keyFrom)){
-                nodeDjkstra=new NodeDjkstra(node,0);
+        Node startNode=vertexes.get(keyFrom);
+        startNode.currentWeight=0;              //для стартовой вершины, в соответствии с алгоритмом задаем вес 0. У остальных она равна бесконечности.
 
-            }else{
-                nodeDjkstra=new NodeDjkstra(node);
-            }
-            mainDjkstraList.add(nodeDjkstra);
-        }
+        //для возможности извлечения минимальных элементов, создаем ArrayList из значений vertexes. Здесь лежат только необработанные вершины
+        ArrayList<Node> mainDjkstraList = new ArrayList<>(vertexes.values());
 
-       // После заполнения сортируем список.
+        // После заполнения сортируем список.
         NodeDjkstraComparator comp = new NodeDjkstraComparator();
-        Collections.sort(mainDjkstraList,comp);
+
 
         while(mainDjkstraList.size()!=0){
+            Node node = Collections.min(mainDjkstraList,comp);
+            mainDjkstraList.remove(node);   //удаляем обработанную вершину
 
+            for(Edge edge:node.getLinkedNodes()){
+                Node nodeEnd=vertexes.get(edge.edgeEnd);
+                float minimalPath=node.currentWeight+edge.edgeWeight;
+                //для вершины находим такую вершину, из которой путь до нашей минимален
+                if(nodeEnd.currentWeight>=minimalPath){
+                    nodeEnd.currentWeight=minimalPath;
+                    nodeEnd.keyOfPreviousNode=node.getNodeIndex();
+                }
+            }
         }
 
-
+        System.out.println("Минимальные пути из вершины "+startNode.getNodeIndex()+":");
+        for (Map.Entry<String, Node> entry : vertexes.entrySet()) {
+            System.out.print(startNode.getNodeIndex());
+            showInfoAboutNodeWithWeight(entry.getValue());
+        }
 
     }
 
@@ -306,6 +340,7 @@ class Node {
     //для алгоритма дейкстры
     boolean isUsed = false;
     float currentWeight = POSITIVE_INFINITY;
+    String keyOfPreviousNode;
 
     public Node() {
         linkedNodes = new LinkedHashSet<>();
@@ -345,34 +380,10 @@ class Node {
 
 }
 
-class NodeDjkstra extends Node{
 
-
-    public NodeDjkstra(NodeDjkstra node) {
-        super(node);
-        this.isUsed = node.isUsed;
-        this.currentWeight = node.currentWeight;
-    }
-
-    public NodeDjkstra(Node node){
-        super(node);
-    }
-
-    NodeDjkstra(Node node, boolean isUsed, float currentWeight) {
-        super(node);
-        this.isUsed = isUsed;
-        this.currentWeight = currentWeight;
-    }
-
-    NodeDjkstra(Node node, float currentWeight) {
-        super(node);
-        this.currentWeight=currentWeight;
-    }
-}
-
-class NodeDjkstraComparator implements Comparator<NodeDjkstra> {
+class NodeDjkstraComparator implements Comparator<Node> {
     @Override
-    public int compare(NodeDjkstra o1, NodeDjkstra o2) {
+    public int compare(Node o1, Node o2) {
         int result;
         result=Float.compare(o1.currentWeight,o2.currentWeight);            //у нас есть POSITIVE_INFINITY, поэтому воспользуемся правильным методов сравнения
         return result;
