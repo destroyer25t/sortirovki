@@ -1,19 +1,63 @@
 package com.company;
 
+import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Vector;
+import java.net.InetAddress;
 
 /*
 * Программа для тестировния скорости сортировок
 * */
 public class Main {
 
+    /**
+     * Возвращает правильный путь до graph.txt в зависимости от моего компьютера
+     * @param hostname Передаваемое имя компьютера
+     * @return полный путь до графа
+     */
+    private static String makePath(String hostname){
+        String fullPathToGraphTxt="";
+        String dontChangedPiece="IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt";
+        switch(hostname){
+            case "IRBIS": {
+                fullPathToGraphTxt="D:\\Users\\tailer_d\\"+dontChangedPiece;
+                break;
+            }
+            case "WICPC": {
+                fullPathToGraphTxt="D:\\Users\\tailer_d\\"+dontChangedPiece;
+                break;
+            }
+            case "305U1A":{
+                fullPathToGraphTxt="D:\\Users\\tailer_d\\"+dontChangedPiece;
+                break;
+            }
+            default:{
+                throw new IllegalArgumentException("Поменяйте путь до графа");
+            }
+        }
+        return fullPathToGraphTxt;
+    }
     /*
      * Тестирование графов
      */
     private static void graphTest(){
+        String computername= null;
         try {
-            Graph graph = new Graph("C:\\Users\\Олег\\IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt");
+            computername = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        String fullPath="";
+        try{
+            fullPath=makePath(computername);
+        }
+        catch(IllegalArgumentException e){
+            System.out.print(e.getMessage());
+        }
+
+        try {
+            Graph graph = new Graph(makePath(computername));
             //graph.showGraphInText();
            // graph.djkstraAlgo("Yekaterinburg");
             graph.primAlgo("Yekaterinburg",0);
@@ -73,6 +117,7 @@ public class Main {
     public static void otherTest(){
         Integer[] knownMass = {2,5,6,6,7};
         Other engine = new Other();
+
         try{
             int position = engine.binarySearch(knownMass, 7);
             System.out.println(position);
@@ -82,12 +127,12 @@ public class Main {
         }
 
 
-
     }
 
     public static void main(String[] args) {
         //sortsTest();
         //otherTest();
+
         graphTest();
     }
 }
