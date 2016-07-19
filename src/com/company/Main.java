@@ -15,7 +15,8 @@ public class Main {
         try {
             Graph graph = new Graph("C:\\Users\\Олег\\IdeaProjects\\sortirovki\\src\\com\\company\\graph.txt");
             //graph.showGraphInText();
-            graph.djkstraAlgo("Yekaterinburg");
+           // graph.djkstraAlgo("Yekaterinburg");
+            graph.primAlgo("Yekaterinburg",0);
 
         }
         catch(IllegalArgumentException e){

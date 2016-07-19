@@ -119,26 +119,26 @@ public class Graph {
     }
 
     public void showInfoAboutNodeWithWeight(Node node) {
-        LinkedList<String> fullPathKeys=new LinkedList<>();
+        LinkedList<String> fullPathKeys = new LinkedList<>();
 
-        if(node.keyOfPreviousNode!=null){
-            showInfoAboutNodeWithWeight(vertexes.get(node.keyOfPreviousNode),fullPathKeys);
+        if (node.keyOfPreviousNode != null) {
+            showInfoAboutNodeWithWeight(vertexes.get(node.keyOfPreviousNode), fullPathKeys);
         }
         fullPathKeys.addLast(node.getNodeIndex());
-        Iterator<String> iter=fullPathKeys.iterator();
+        Iterator<String> iter = fullPathKeys.iterator();
 
-        while(iter.hasNext()){
-            System.out.print("->"+iter.next());
+        while (iter.hasNext()) {
+            System.out.print("->" + iter.next());
         }
 
-        System.out.print(" Длина пути: "+node.currentWeight);
+        System.out.print(" Длина пути: " + node.currentWeight);
         System.out.println();
     }
 
-    private LinkedList<String> showInfoAboutNodeWithWeight(Node node, LinkedList<String> list){
-        if(node.keyOfPreviousNode!=null){
+    private LinkedList<String> showInfoAboutNodeWithWeight(Node node, LinkedList<String> list) {
+        if (node.keyOfPreviousNode != null) {
             list.add(node.getNodeIndex());
-            showInfoAboutNodeWithWeight(vertexes.get(node.keyOfPreviousNode),list);
+            showInfoAboutNodeWithWeight(vertexes.get(node.keyOfPreviousNode), list);
         }
         return list;
     }
@@ -209,7 +209,6 @@ public class Graph {
 
         }
     }
-
 
 
     /*
@@ -285,8 +284,51 @@ public class Graph {
 
     }
 
-    public void primAlgo() {
+    public void primAlgo(String keyFrom, int queueMethod) {
+        if(this.isOriented){
+            throw new IllegalArgumentException("Данный алгоритм работает только с неориентированными графамии");
+        }
+        NodeDjkstraComparator comparator = new NodeDjkstraComparator();
+        Node node=vertexes.get(keyFrom);
+        node.currentWeight=0;
 
+        if(queueMethod==0){
+            ArrayList<Node> priorityList= new ArrayList<>(vertexes.values());
+            while(!priorityList.isEmpty()){
+                node=Collections.min(priorityList,comparator);
+                priorityList.remove(node);
+                for(Edge edge:node.getLinkedNodes()){
+                    Node nodeTemp=vertexes.get(edge.edgeEnd);
+                    if(edge.edgeWeight<nodeTemp.currentWeight){
+                        nodeTemp.currentWeight=edge.edgeWeight;
+                    }
+                }
+            }
+
+        }
+        else if (queueMethod==1){
+            PriorityQueue<Node> priorityQueue = new PriorityQueue<>(vertexes.size(),comparator);     //очередь с приоритетами, должна быть быстрее аррайлиста
+            for(Node vertexesNode:vertexes.values()){
+                priorityQueue.add(vertexesNode);
+            }
+            while(!priorityQueue.isEmpty()){
+                node=priorityQueue.poll();
+                for(Edge edge:node.getLinkedNodes()){
+                    Node nodeTemp=vertexes.get(edge.edgeEnd);
+                    if(edge.edgeWeight<nodeTemp.currentWeight){
+                        nodeTemp.currentWeight=edge.edgeWeight;
+                    }
+                }
+            }
+
+        }
+        else{
+            throw new IllegalArgumentException("Второй аргумент должен быть 0 для использования ArrayList и 1 для использования PriorityQueue");
+        }
+        for(Node node1:vertexes.values()){
+            System.out.print(node1.getNodeIndex()+" "+node1.currentWeight+"\n");
+
+        }
     }
 
 
@@ -297,8 +339,8 @@ public class Graph {
         if (this.allowNegativeWeight) {
             throw new IllegalArgumentException("Данный алгоритм работает с положительными связями.");
         }
-        Node startNode=vertexes.get(keyFrom);
-        startNode.currentWeight=0;              //для стартовой вершины, в соответствии с алгоритмом задаем вес 0. У остальных она равна бесконечности.
+        Node startNode = vertexes.get(keyFrom);
+        startNode.currentWeight = 0;              //для стартовой вершины, в соответствии с алгоритмом задаем вес 0. У остальных она равна бесконечности.
 
         //для возможности извлечения минимальных элементов, создаем ArrayList из значений vertexes. Здесь лежат только необработанные вершины
         ArrayList<Node> mainDjkstraList = new ArrayList<>(vertexes.values());
@@ -307,22 +349,22 @@ public class Graph {
         NodeDjkstraComparator comp = new NodeDjkstraComparator();
 
 
-        while(mainDjkstraList.size()!=0){
-            Node node = Collections.min(mainDjkstraList,comp);
+        while (mainDjkstraList.size() != 0) {
+            Node node = Collections.min(mainDjkstraList, comp);
             mainDjkstraList.remove(node);   //удаляем обработанную вершину
 
-            for(Edge edge:node.getLinkedNodes()){
-                Node nodeEnd=vertexes.get(edge.edgeEnd);
-                float minimalPath=node.currentWeight+edge.edgeWeight;
+            for (Edge edge : node.getLinkedNodes()) {
+                Node nodeEnd = vertexes.get(edge.edgeEnd);
+                float minimalPath = node.currentWeight + edge.edgeWeight;
                 //для вершины находим такую вершину, из которой путь до нашей минимален
-                if(nodeEnd.currentWeight>=minimalPath){
-                    nodeEnd.currentWeight=minimalPath;
-                    nodeEnd.keyOfPreviousNode=node.getNodeIndex();
+                if (nodeEnd.currentWeight >= minimalPath) {
+                    nodeEnd.currentWeight = minimalPath;
+                    nodeEnd.keyOfPreviousNode = node.getNodeIndex();
                 }
             }
         }
 
-        System.out.println("Минимальные пути из вершины "+startNode.getNodeIndex()+":");
+        System.out.println("Минимальные пути из вершины " + startNode.getNodeIndex() + ":");
         for (Map.Entry<String, Node> entry : vertexes.entrySet()) {
             System.out.print(startNode.getNodeIndex());
             showInfoAboutNodeWithWeight(entry.getValue());
@@ -373,9 +415,9 @@ class Node {
         linkedNodes.add(edge);
     }
 
-    public void resetIsUsedAndCurrentWeight(){
-        isUsed=false;
-        currentWeight=POSITIVE_INFINITY;
+    public void resetIsUsedAndCurrentWeight() {
+        isUsed = false;
+        currentWeight = POSITIVE_INFINITY;
     }
 
 }
@@ -385,7 +427,7 @@ class NodeDjkstraComparator implements Comparator<Node> {
     @Override
     public int compare(Node o1, Node o2) {
         int result;
-        result=Float.compare(o1.currentWeight,o2.currentWeight);            //у нас есть POSITIVE_INFINITY, поэтому воспользуемся правильным методов сравнения
+        result = Float.compare(o1.currentWeight, o2.currentWeight);            //у нас есть POSITIVE_INFINITY, поэтому воспользуемся правильным методов сравнения
         return result;
     }
 }

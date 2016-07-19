@@ -10,4 +10,5 @@ Novosibirsk->Vladivostok->5790
 Yekaterinburg->Vladivostok->10500
 Kazan->ARZAMAS-2->448
 Kazan->Moscow->805
+Yekaterinburg->Moscow->5000
 Sankt-Peterburg->Kronshtadt->52
